@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="LeaderboardApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ward Accountability Leaderboard — CivicTrack</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <style>
+    .rank-medal {
+      font-weight: 800;
+      font-size: 15px;
+    }
+    .score-grade {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      text-align: center;
+      border-radius: 50%;
+      font-weight: 900;
+      font-size: 14px;
+      margin-left: 8px;
+    }
+    .breakdown-box {
+      background: #f8fafc;
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      border: 1px dashed var(--border);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      font-size: 13px;
+    }
+    .breakdown-item strong {
+      display: block;
+      color: var(--gray);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+    .breakdown-item span {
+      font-size: 16px;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body ng-controller="LeaderboardController">
+
+  <!-- Sticky Navbar (Pure AngularJS) -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <span class="logo-badge">CT</span>
+        <span>CivicTrack</span>
+      </a>
+
+      <button class="nav-hamburger" ng-click="navOpen = !navOpen" aria-label="Toggle navigation">☰</button>
+
+      <div class="nav-menu-wrapper" ng-class="{'active': navOpen}">
+        <ul class="nav-links">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/pages/report.html" class="nav-link">Report Issue</a></li>
+          <li><a href="/pages/leaderboard.html" class="nav-link active">Leaderboard</a></li>
+          <li ng-if="currentUser && currentUser.role === 'citizen'">
+            <a href="/pages/citizen-dashboard.html" class="nav-link">My Dashboard</a>
+          </li>
+          <li ng-if="currentUser && currentUser.role === 'authority'">
+            <a href="/pages/authority-dashboard.html" class="nav-link">Authority Dashboard</a>
+          </li>
+        </ul>
+
+        <div class="nav-auth">
+          <div class="user-tag" ng-if="currentUser">
+            <span>👤 {{currentUser.name}}</span>
+            <span class="role-pill" ng-class="currentUser.role">{{currentUser.role}}</span>
+          </div>
+          <button ng-if="currentUser" ng-click="logout()" class="btn btn-outline-danger btn-sm">Logout</button>
+          <a ng-if="!currentUser" href="/pages/login.html" class="btn btn-outline-primary btn-sm">Login</a>
+          <a ng-if="!currentUser" href="/pages/register.html" class="btn btn-primary btn-sm">Register</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div style="margin-bottom: 24px;">
+      <h1 style="font-size: 32px; font-weight: 900; color: var(--dark);">Ward Accountability Leaderboard</h1>
+      <p style="color: var(--gray); font-size: 16px;">
+        Public transparency ranking of Chennai municipal ward officers based on verified civic issue resolution metrics, response agility, and escalation avoidance.
+      </p>
+    </div>
+
+    <!-- Comparative Canvas Bar Chart -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3>Ward Accountability Scores Comparison</h3>
+        <span style="font-size: 12px; color: var(--gray);">🟢 ≥70 Exemplary &nbsp;|&nbsp; 🟠 40–69 Moderate &nbsp;|&nbsp; 🔴 &lt;40 Lagging</span>
+      </div>
+      <div style="width: 100%; overflow-x: auto;">
+        <canvas id="leaderboardChartCanvas" height="280"></canvas>
+      </div>
+    </div>
+
+    <!-- Leaderboard Table Card -->
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+        <div>
+          <h2 style="font-size: 20px; font-weight: 800; color: var(--dark);">Official Performance Rankings</h2>
+          <span style="font-size: 12px; color: var(--gray);">Click on any row to expand the detailed score formula breakdown</span>
+        </div>
+
+        <!-- Search input to filter by authority name or ward using Angular filter -->
+        <div style="min-width: 260px;">
+          <input type="text" ng-model="searchQuery" class="form-control" placeholder="🔍 Search officer or ward...">
+        </div>
+      </div>
+
+      <div ng-if="loading" class="alert alert-info" style="text-align: center;">
+        Calculating ward accountability rankings...
+      </div>
+
+      <div class="table-responsive" ng-if="!loading">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 10%;">Rank</th>
+              <th style="width: 22%;">Authority / Officer</th>
+              <th style="width: 14%;">Ward</th>
+              <th style="width: 18%;">Department</th>
+              <th style="width: 10%;">Assigned</th>
+              <th style="width: 10%;">Resolved</th>
+              <th style="width: 10%;">Avg Speed</th>
+              <th style="width: 16%;">Accountability Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat-start="item in leaderboard | filter:searchQuery | orderBy:'-accountabilityScore'"
+                class="expandable-row"
+                ng-click="toggleExpand(item.authorityId._id || item._id)"
+                title="Click to toggle score component breakdown">
+              <td>
+                <span class="rank-medal">{{getRankDisplay($index)}}</span>
+              </td>
+              <td>
+                <strong>{{item.authorityName || item.authorityId.name || 'Ward Officer'}}</strong>
+              </td>
+              <td>
+                <span style="font-weight: 700; color: var(--primary);">📍 {{item.ward || item.authorityId.ward}}</span>
+              </td>
+              <td>
+                <span style="color: var(--gray); font-size: 13px;">{{item.department || item.authorityId.department || 'Civic Works'}}</span>
+              </td>
+              <td>{{item.totalAssigned}}</td>
+              <td><strong style="color: #166534;">{{item.totalResolved}}</strong></td>
+              <td>{{item.avgResolutionHours}}h</td>
+              <td>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <strong class="score-display" style="font-size: 22px;" ng-class="getScoreClass(item.accountabilityScore)">
+                    {{item.accountabilityScore}}
+                  </strong>
+                  <span class="badge" ng-class="getGradeClass(item.accountabilityScore)">
+                    Grade {{getGrade(item.accountabilityScore)}}
+                  </span>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Expandable Inline Score Breakdown -->
+            <tr ng-repeat-end ng-if="expandedAuthorityId === (item.authorityId._id || item._id)" class="breakdown-row">
+              <td colspan="8">
+                <div class="breakdown-box">
+                  <div class="breakdown-item">
+                    <strong>Resolution Rate (40%)</strong>
+                    <span style="color: #1a6b3c;">{{item.scoreBreakdown.resolutionRate}}%</span>
+                  </div>
+                  <div class="breakdown-item">
+                    <strong>Speed Score (30%)</strong>
+                    <span style="color: #0984e3;">{{item.scoreBreakdown.speedScore}}%</span>
+                  </div>
+                  <div class="breakdown-item">
+                    <strong>Response Rate &lt;24h (20%)</strong>
+                    <span style="color: #8e44ad;">{{item.scoreBreakdown.responseRate}}%</span>
+                  </div>
+                  <div class="breakdown-item">
+                    <strong>Escalation Penalty (-10%)</strong>
+                    <span style="color: #d63031;">-{{item.scoreBreakdown.escalationPenalty}}%</span>
+                  </div>
+                  <div class="breakdown-item">
+                    <strong>Total Escalations</strong>
+                    <span style="color: var(--danger);">{{item.totalEscalated}} breaches</span>
+                  </div>
+                  <div class="breakdown-item">
+                    <strong>Last Audit Update</strong>
+                    <span style="color: var(--dark); font-size: 13px;">{{item.lastUpdated | date:'medium'}}</span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr ng-if="(leaderboard | filter:searchQuery).length === 0">
+              <td colspan="8" style="text-align: center; color: var(--gray); padding: 24px;">
+                No authority records match your search query.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-text">
+        <strong>CivicTrack</strong> — Making Local Governance Accountable
+      </div>
+      <div>
+        <a href="/" style="color: #94a3b8; margin-right: 16px;">Home</a>
+        <a href="/pages/report.html" style="color: #94a3b8;">Report Grievance</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Pure AngularJS 1.8 - NO jQuery on this page -->
+  <script src="/vendor/angular.min.js"></script>
+  <script src="/js/leaderboard.js"></script>
+</body>
+</html>

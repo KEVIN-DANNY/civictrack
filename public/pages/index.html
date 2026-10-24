@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicTrack — Civic Issue Tracker &amp; Accountability</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+  <!-- Sticky Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <span class="logo-badge">CT</span>
+        <span>CivicTrack</span>
+      </a>
+
+      <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation">☰</button>
+
+      <div class="nav-menu-wrapper" id="navMenuWrapper">
+        <ul class="nav-links">
+          <li><a href="/" class="nav-link active">Home</a></li>
+          <li><a href="/pages/report.html" class="nav-link">Report Issue</a></li>
+          <li><a href="/pages/leaderboard.html" class="nav-link">Leaderboard</a></li>
+          <li id="navLinksDynamic"></li>
+        </ul>
+
+        <div class="nav-auth" id="navAuthDynamic">
+          <a href="/pages/login.html" class="btn btn-outline-primary btn-sm">Login</a>
+          <a href="/pages/register.html" class="btn btn-primary btn-sm">Register</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container">
+    <!-- Hero Banner -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1>Report. Track. Demand Action.</h1>
+        <p>A transparent civic grievance platform empowering citizens to track local ward issues and hold municipal authorities directly accountable with real-time scoring.</p>
+        <a href="/pages/report.html" class="btn btn-accent btn-lg">📢 Report a Civic Issue</a>
+      </div>
+    </section>
+
+    <!-- Summary Stats Bar -->
+    <section class="stats-bar">
+      <div class="stat-item total">
+        <span class="stat-label">Total Grievances</span>
+        <span class="stat-number" id="statTotal">-</span>
+      </div>
+      <div class="stat-item resolved">
+        <span class="stat-label">Resolved Issues</span>
+        <span class="stat-number" id="statResolved">-</span>
+      </div>
+      <div class="stat-item pending">
+        <span class="stat-label">Pending Review</span>
+        <span class="stat-number" id="statPending">-</span>
+      </div>
+      <div class="stat-item escalated">
+        <span class="stat-label">Escalated Breaches</span>
+        <span class="stat-number" id="statEscalated">-</span>
+      </div>
+    </section>
+
+    <!-- Issues Feed Section -->
+    <section id="issuesFeedSection">
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="search-group">
+          <input type="text" id="filterSearch" class="form-control" placeholder="🔍 Search by issue title, description, or landmark...">
+        </div>
+        <div>
+          <select id="filterWard" class="form-control">
+            <option value="all">All Wards</option>
+          </select>
+        </div>
+        <div>
+          <select id="filterCategory" class="form-control">
+            <option value="all">All Categories</option>
+          </select>
+        </div>
+        <div>
+          <select id="filterStatus" class="form-control">
+            <option value="all">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="acknowledged">Acknowledged</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+            <option value="escalated">Escalated</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Loading and Alert states -->
+      <div id="issuesLoading" class="alert alert-info" style="text-align: center; display: none;">
+        Loading civic issues feed...
+      </div>
+      <div id="noIssuesAlert" class="alert alert-warning" style="text-align: center; display: none;">
+        No civic issues match your selected filters. Try choosing different criteria or report a new issue!
+      </div>
+
+      <!-- Responsive Grid for Issue Cards -->
+      <div id="issuesGrid" class="issue-grid"></div>
+
+      <!-- Pagination Controls -->
+      <div class="pagination">
+        <button id="prevPageBtn" class="btn btn-outline-secondary btn-sm" disabled>« Previous</button>
+        <span id="pageInfo" class="pagination-info">Page 1</span>
+        <button id="nextPageBtn" class="btn btn-outline-secondary btn-sm" disabled>Next »</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-text">
+        <strong>CivicTrack</strong> — Making Local Governance Accountable
+      </div>
+      <div>
+        <a href="/pages/leaderboard.html" style="color: #94a3b8; margin-right: 16px;">Ward Rankings</a>
+        <a href="/pages/report.html" style="color: #94a3b8;">Report Grievance</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/vendor/jquery.min.js"></script>
+  <script src="/js/citizen.js"></script>
+  <script>
+    $(document).ready(function() {
+      initIndexPage();
+    });
+  </script>
+</body>
+</html>

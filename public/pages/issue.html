@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Issue Details — CivicTrack</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <style>
+    .issue-detail-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 28px;
+    }
+    .issue-photo-wrapper {
+      margin: 20px 0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      max-height: 480px;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .issue-photo-wrapper img {
+      width: 100%;
+      height: auto;
+      max-height: 480px;
+      object-fit: contain;
+    }
+    .info-list-card {
+      background: #f8fafc;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 18px;
+      margin-bottom: 24px;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      color: var(--gray);
+      font-weight: 600;
+    }
+    .info-val {
+      font-weight: 700;
+      color: var(--dark);
+      text-align: right;
+    }
+    @media (max-width: 992px) {
+      .issue-detail-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <span class="logo-badge">CT</span>
+        <span>CivicTrack</span>
+      </a>
+
+      <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation">☰</button>
+
+      <div class="nav-menu-wrapper" id="navMenuWrapper">
+        <ul class="nav-links">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/pages/report.html" class="nav-link">Report Issue</a></li>
+          <li><a href="/pages/leaderboard.html" class="nav-link">Leaderboard</a></li>
+          <li id="navLinksDynamic"></li>
+        </ul>
+
+        <div class="nav-auth" id="navAuthDynamic"></div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div id="issueLoading" class="alert alert-info" style="text-align: center;">
+      Loading grievance details...
+    </div>
+
+    <div id="issueDetailAlert" class="alert" style="display: none;"></div>
+
+    <div id="issueContainer" style="display: none;">
+      <!-- Breadcrumb & Back -->
+      <div style="margin-bottom: 16px;">
+        <a href="/" class="btn btn-outline-secondary btn-sm">← Back to Issue Feed</a>
+      </div>
+
+      <!-- Escalation Alert Banner if applicable -->
+      <div id="issueEscalationAlert" class="alert alert-danger" style="display: none;"></div>
+
+      <div class="issue-detail-layout">
+        <!-- Left Column: Details, Photo, Comments -->
+        <div>
+          <div class="card" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 12px; flex-wrap: wrap;">
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <span id="issueStatusBadge" class="badge"></span>
+                <span id="issueCategoryBadge"></span>
+              </div>
+
+              <!-- Upvote Button -->
+              <button id="btnUpvote" class="btn-upvote" title="Login to upvote">
+                <span id="heartIcon" class="heart-icon">🤍</span>
+                <span>Upvote (<span id="upvoteCount">0</span>)</span>
+              </button>
+            </div>
+
+            <h1 id="issueTitle" style="font-size: 26px; font-weight: 800; color: var(--dark); margin-bottom: 12px; line-height: 1.3;"></h1>
+
+            <div style="color: var(--gray); font-size: 14px; margin-bottom: 20px;">
+              <span id="issueWard" style="font-weight: 700; color: var(--primary);"></span>
+              <span> • 📍 </span>
+              <span id="issueAddress"></span>
+              <div id="issueCoordinates" style="margin-top: 4px; font-size: 12px; color: #64748b; display: none;"></div>
+            </div>
+
+            <div style="border-top: 1px solid var(--border); padding-top: 16px; margin-top: 10px;">
+              <h3 style="font-size: 16px; color: var(--dark); font-weight: 700; margin-bottom: 8px;">Description</h3>
+              <p id="issueDescription" style="font-size: 15px; color: #334155; line-height: 1.6; white-space: pre-line;"></p>
+            </div>
+
+            <!-- Optional Photo -->
+            <div id="issuePhotoContainer" style="display: none;">
+              <h3 style="font-size: 16px; color: var(--dark); font-weight: 700; margin-top: 20px; margin-bottom: 8px;">Attached Evidence Photo</h3>
+              <div class="issue-photo-wrapper">
+                <img id="issuePhoto" src="" alt="Issue evidence">
+              </div>
+            </div>
+          </div>
+
+          <!-- Comments Section -->
+          <div class="card">
+            <h3 id="commentCountTitle" style="font-size: 18px; font-weight: 700; color: var(--dark); margin-bottom: 16px;">Comments</h3>
+
+            <div id="commentsList" class="comment-list"></div>
+
+            <!-- Post Comment Form (Protected) -->
+            <div id="commentFormCard" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; display: none;">
+              <h4 style="font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 10px;">Add a Citizen / Officer Comment</h4>
+              <form id="commentForm">
+                <div class="form-group">
+                  <textarea id="commentInput" class="form-control" rows="3" placeholder="Share an update, additional context, or feedback on this civic issue..." required></textarea>
+                </div>
+                <button type="submit" id="btnPostComment" class="btn btn-primary btn-sm">Post Comment</button>
+              </form>
+            </div>
+
+            <div id="loginToCommentMsg" class="alert alert-info" style="margin-top: 16px; display: none;">
+              <a href="/pages/login.html" style="font-weight: 700;">Sign In</a> to post comments or share updates on this issue.
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Metadata & Vertical Stepper Timeline -->
+        <div>
+          <!-- Administrative Meta -->
+          <div class="info-list-card">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--dark); margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">Governance Details</h3>
+            <div class="info-row">
+              <span class="info-label">Reported By</span>
+              <span class="info-val" id="issueReportedBy"></span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Assigned Officer</span>
+              <span class="info-val" id="issueAssignedTo"></span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Filed On</span>
+              <span class="info-val" id="issueCreatedAt"></span>
+            </div>
+            <div class="info-row" id="issueResolvedAtRow" style="display: none;">
+              <span class="info-label">Resolved On</span>
+              <span class="info-val" id="issueResolvedAt" style="color: #166534;"></span>
+            </div>
+          </div>
+
+          <!-- Vertical Stepper Timeline -->
+          <div class="card">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--dark); margin-bottom: 16px;">Resolution Lifecycle</h3>
+            <ul id="statusTimeline" class="stepper-timeline"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-text">
+        <strong>CivicTrack</strong> — Making Local Governance Accountable
+      </div>
+    </div>
+  </footer>
+
+  <script src="/vendor/jquery.min.js"></script>
+  <script src="/js/citizen.js"></script>
+  <script src="/js/issue.js"></script>
+  <script>
+    $(document).ready(function() {
+      initIssueDetail();
+    });
+  </script>
+</body>
+</html>

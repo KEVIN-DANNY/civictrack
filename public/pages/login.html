@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — CivicTrack</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <style>
+    .auth-wrapper {
+      max-width: 440px;
+      margin: 40px auto;
+    }
+    .auth-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .auth-header h2 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+    .auth-header p {
+      color: var(--gray);
+      font-size: 14px;
+    }
+    .demo-credentials {
+      margin-top: 24px;
+      background: #f8fafc;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      font-size: 12px;
+      color: #475569;
+    }
+    .demo-credentials strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--dark);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <span class="logo-badge">CT</span>
+        <span>CivicTrack</span>
+      </a>
+
+      <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation">☰</button>
+
+      <div class="nav-menu-wrapper" id="navMenuWrapper">
+        <ul class="nav-links">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/pages/report.html" class="nav-link">Report Issue</a></li>
+          <li><a href="/pages/leaderboard.html" class="nav-link">Leaderboard</a></li>
+        </ul>
+
+        <div class="nav-auth">
+          <a href="/pages/register.html" class="btn btn-outline-primary btn-sm">Create Citizen Account</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div class="auth-wrapper">
+      <div class="card">
+        <div class="auth-header">
+          <h2>Sign In to CivicTrack</h2>
+          <p>Access your dashboard and manage civic issues</p>
+        </div>
+
+        <div id="authAlert" class="alert" style="display: none;"></div>
+
+        <form id="loginForm" novalidate>
+          <div class="form-group">
+            <label for="loginEmail" class="form-label">Email Address</label>
+            <input type="email" id="loginEmail" class="form-control" placeholder="name@example.com" required>
+            <div id="emailError" class="error-message">Please enter a valid email.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="loginPassword" class="form-label">Password</label>
+            <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+            <div id="passwordError" class="error-message">Password must be at least 6 characters.</div>
+          </div>
+
+          <button type="submit" id="loginBtn" class="btn btn-primary btn-block btn-lg" style="margin-top: 10px;">Sign In</button>
+        </form>
+
+        <p style="text-align: center; margin-top: 20px; font-size: 14px; color: var(--gray);">
+          Don't have an account? <a href="/pages/register.html" style="font-weight: 600;">Register as a Citizen</a>
+        </p>
+
+        <div class="demo-credentials">
+          <strong>Demo Seed Logins:</strong>
+          • <em>Citizen:</em> citizen1@civictrack.com / Citizen@123<br>
+          • <em>Authority (Adyar):</em> adyar.authority@civictrack.com / Authority@123<br>
+          • <em>Authority (Anna Nagar):</em> annanagar.authority@civictrack.com / Authority@123<br>
+          • <em>Authority (T Nagar):</em> tnagar.authority@civictrack.com / Authority@123<br>
+          • <em>Admin:</em> admin@civictrack.com / Admin@123
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-text">
+        <strong>CivicTrack</strong> — Making Local Governance Accountable
+      </div>
+    </div>
+  </footer>
+
+  <script src="/vendor/jquery.min.js"></script>
+  <script src="/js/auth.js"></script>
+</body>
+</html>

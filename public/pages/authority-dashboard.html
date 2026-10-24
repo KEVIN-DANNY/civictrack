@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="AuthorityApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authority Dashboard — CivicTrack</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <style>
+    .authority-top-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .score-hero-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .score-val-large {
+      font-size: 64px;
+      font-weight: 900;
+      line-height: 1;
+      margin: 8px 0;
+    }
+    @media (max-width: 992px) {
+      .authority-top-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body ng-controller="DashboardController">
+
+  <!-- Sticky Navbar (Pure AngularJS) -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <span class="logo-badge">CT</span>
+        <span>CivicTrack</span>
+      </a>
+
+      <button class="nav-hamburger" ng-click="navOpen = !navOpen" aria-label="Toggle navigation">☰</button>
+
+      <div class="nav-menu-wrapper" ng-class="{'active': navOpen}">
+        <ul class="nav-links">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/pages/leaderboard.html" class="nav-link">Leaderboard</a></li>
+          <li><a href="/pages/authority-dashboard.html" class="nav-link active">Authority Dashboard</a></li>
+        </ul>
+
+        <div class="nav-auth">
+          <div class="user-tag" ng-if="currentUser">
+            <span>🏛️ {{currentUser.name}} (Ward: {{currentUser.ward}})</span>
+            <span class="role-pill authority">Authority</span>
+          </div>
+          <button ng-click="logout()" class="btn btn-outline-danger btn-sm">Logout</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <!-- Top Header -->
+    <div style="margin-bottom: 20px;">
+      <h1 style="font-size: 28px; font-weight: 800; color: var(--dark);">Ward Officer Command Dashboard</h1>
+      <p style="color: var(--gray); font-size: 14px;">
+        Jurisdiction: <strong>{{currentUser.ward || 'Loading...'}}</strong> | Department: <strong>{{currentUser.department || 'Municipal Corporation'}}</strong>
+      </p>
+    </div>
+
+    <!-- Alert notifications -->
+    <div ng-if="alertMessage" class="alert alert-{{alertType}}">
+      {{alertMessage}}
+    </div>
+
+    <!-- Top Section: Stats Cards and Large Accountability Score -->
+    <div class="authority-top-grid" ng-if="stats">
+      <!-- 4 Quick Stats -->
+      <div>
+        <div class="stats-bar" style="margin-bottom: 0;">
+          <div class="stat-item total">
+            <span class="stat-label">Assigned Issues</span>
+            <span class="stat-number">{{stats.totalAssigned}}</span>
+          </div>
+          <div class="stat-item resolved">
+            <span class="stat-label">Resolved Issues</span>
+            <span class="stat-number">{{stats.totalResolved}}</span>
+          </div>
+          <div class="stat-item pending">
+            <span class="stat-label">Pending / Active</span>
+            <span class="stat-number">{{stats.totalAssigned - stats.totalResolved}}</span>
+          </div>
+          <div class="stat-item escalated">
+            <span class="stat-label">Escalated</span>
+            <span class="stat-number">{{stats.totalEscalated}}</span>
+          </div>
+        </div>
+
+        <!-- Metric details card -->
+        <div class="card" style="margin-top: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <span style="font-size: 13px; color: var(--gray); font-weight: 600;">Avg Resolution Speed:</span>
+              <span style="font-size: 16px; font-weight: 800; color: var(--dark); margin-left: 6px;">{{stats.avgResolutionHours}} hours</span>
+            </div>
+            <div>
+              <span style="font-size: 13px; color: var(--gray); font-weight: 600;">Quick Response (&lt;24h):</span>
+              <span style="font-size: 16px; font-weight: 800; color: var(--primary); margin-left: 6px;">{{stats.quickResponseCount}} issues</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Large Accountability Score Card -->
+      <div class="score-hero-card">
+        <span class="stat-label">Official Accountability Score</span>
+        <div class="score-val-large" ng-class="getScoreClass(stats.accountabilityScore)">
+          {{stats.accountabilityScore}}<span style="font-size: 28px; font-weight: 700;">/100</span>
+        </div>
+        <div style="font-size: 13px; font-weight: 600; color: var(--gray); margin-top: 4px;">
+          <span ng-if="stats.accountabilityScore >= 70" style="color: #166534;">🌟 Exemplary Performance (Tier A)</span>
+          <span ng-if="stats.accountabilityScore >= 40 && stats.accountabilityScore < 70" style="color: #b45309;">⚠️ Moderate Performance (Requires Attention)</span>
+          <span ng-if="stats.accountabilityScore < 40" style="color: #b91c1c;">🚨 Critical Deficiency (Under Audit)</span>
+        </div>
+        <small style="color: #94a3b8; font-size: 11px; margin-top: 8px;">Recalculated in real-time on every update</small>
+      </div>
+    </div>
+
+    <!-- Score Breakdown Section with Canvas Chart -->
+    <div class="chart-container" ng-if="stats">
+      <div class="chart-header">
+        <h3>Accountability Score Component Breakdown</h3>
+        <span style="font-size: 12px; color: var(--gray);">Formula: (Res × 0.4) + (Speed × 0.3) + (Response × 0.2) - (Escalation × 0.1)</span>
+      </div>
+
+      <!-- HTML5 Canvas API Horizontal Bar Chart (Drawn by Vanilla JS in controller) -->
+      <div style="width: 100%; overflow-x: auto;">
+        <canvas id="breakdownCanvas" height="240"></canvas>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+        <div style="font-size: 13px;">
+          <strong style="color: #1a6b3c;">■ Resolution Rate:</strong> {{stats.scoreBreakdown.resolutionRate}}%
+        </div>
+        <div style="font-size: 13px;">
+          <strong style="color: #0984e3;">■ Speed Score:</strong> {{stats.scoreBreakdown.speedScore}}%
+        </div>
+        <div style="font-size: 13px;">
+          <strong style="color: #8e44ad;">■ Response Rate:</strong> {{stats.scoreBreakdown.responseRate}}%
+        </div>
+        <div style="font-size: 13px;">
+          <strong style="color: #d63031;">■ Escalation Penalty:</strong> -{{stats.scoreBreakdown.escalationPenalty}}%
+        </div>
+      </div>
+    </div>
+
+    <!-- Issues Management Table -->
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+        <h2 style="font-size: 20px; font-weight: 800; color: var(--dark);">Assigned Ward Issues ({{filteredIssues.length || issues.length}})</h2>
+
+        <!-- Status Filter with ng-model -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label for="authorityStatusFilter" style="font-size: 13px; font-weight: 600; color: var(--gray);">Filter by Status:</label>
+          <select id="authorityStatusFilter" ng-model="statusFilter" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px;">
+            <option value="all">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="acknowledged">Acknowledged</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+            <option value="escalated">Escalated</option>
+          </select>
+        </div>
+      </div>
+
+      <div ng-if="loading" class="alert alert-info" style="text-align: center;">
+        Loading assigned ward issues...
+      </div>
+
+      <div class="table-responsive" ng-if="!loading">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 25%;">Title</th>
+              <th style="width: 12%;">Category</th>
+              <th style="width: 8%;">Upvotes</th>
+              <th style="width: 12%;">Status</th>
+              <th style="width: 11%;">Reported Date</th>
+              <th style="width: 10%;">Days Open</th>
+              <th style="width: 22%;">Action &amp; Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="issue in filteredIssues = (issues | filter:filterByStatus)"
+                ng-class="{'row-escalated': issue.escalationLevel > 0}">
+              <td>
+                <strong><a href="/pages/issue.html?id={{issue._id}}">{{issue.title}}</a></strong>
+                <div style="font-size: 12px; color: var(--gray); margin-top: 2px;">
+                  📍 {{issue.location.address}}
+                </div>
+                <div ng-if="issue.escalationLevel > 0" class="escalation-indicator" style="margin-top: 4px;">
+                  <span class="pulsing-dot"></span> Tier {{issue.escalationLevel}} Escalated
+                </div>
+              </td>
+              <td><span class="category-badge">{{issue.category}}</span></td>
+              <td>❤️ {{issue.upvoteCount || 0}}</td>
+              <td>
+                <span class="badge badge-{{issue.status}}">{{issue.status}}</span>
+              </td>
+              <td>{{issue.createdAt | date:'shortDate'}}</td>
+              <td><strong>{{getDaysOpen(issue.createdAt)}}</strong></td>
+              <td>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <!-- Status dropdown with ng-model -->
+                  <select ng-model="newStatuses[issue._id]" class="form-control" style="padding: 4px 8px; font-size: 12px;">
+                    <option value="pending">pending</option>
+                    <option value="acknowledged">acknowledged</option>
+                    <option value="in_progress">in_progress</option>
+                    <option value="resolved">resolved</option>
+                    <option value="escalated">escalated</option>
+                  </select>
+
+                  <!-- Note input with ng-model -->
+                  <textarea ng-model="updateNotes[issue._id]" class="form-control" rows="2" style="font-size: 12px; min-height: 48px; padding: 4px 8px;" placeholder="Optional inspection/action note..."></textarea>
+
+                  <button ng-click="updateIssueStatus(issue)" ng-disabled="issue.isUpdating" class="btn btn-primary btn-sm">
+                    {{issue.isUpdating ? 'Updating...' : 'Update Status'}}
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <tr ng-if="filteredIssues.length === 0">
+              <td colspan="7" style="text-align: center; color: var(--gray); padding: 24px;">
+                No issues found matching the selected status filter.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-text">
+        <strong>CivicTrack</strong> — Making Local Governance Accountable
+      </div>
+      <div>
+        <a href="/pages/leaderboard.html" style="color: #94a3b8;">Public Ward Rankings</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Pure AngularJS 1.8 - NO jQuery on this page -->
+  <script src="/vendor/angular.min.js"></script>
+  <script src="/js/authority-dashboard.js"></script>
+</body>
+</html>

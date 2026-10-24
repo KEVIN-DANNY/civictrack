@@ -1,0 +1,22 @@
+{
+  "name": "civic-track",
+  "version": "1.0.0",
+  "description": "CivicTrack — Civic Issue Tracker with Accountability Scoring",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.8",
+    "express": "^5.3.0",
+    "express-session": "^1.19.0",
+    "mongoose": "^9.11.2",
+    "multer": "^2.4.0",
+    "node-cron": "^4.6.0",
+    "nodemon": "^3.1.14"
+  }
+}

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Civic Issue — CivicTrack</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <style>
+    .report-wrapper {
+      max-width: 760px;
+      margin: 20px auto;
+    }
+    .preview-box {
+      margin-top: 10px;
+      display: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px;
+      background: #fafafa;
+      max-width: 320px;
+    }
+    .preview-box img {
+      width: 100%;
+      height: auto;
+      border-radius: var(--radius-sm);
+      display: block;
+    }
+    .coordinates-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <span class="logo-badge">CT</span>
+        <span>CivicTrack</span>
+      </a>
+
+      <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation">☰</button>
+
+      <div class="nav-menu-wrapper" id="navMenuWrapper">
+        <ul class="nav-links">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/pages/report.html" class="nav-link active">Report Issue</a></li>
+          <li><a href="/pages/leaderboard.html" class="nav-link">Leaderboard</a></li>
+          <li id="navLinksDynamic"></li>
+        </ul>
+
+        <div class="nav-auth" id="navAuthDynamic"></div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div class="report-wrapper">
+      <div class="card">
+        <div style="margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+          <h2 style="font-size: 26px; color: var(--primary); font-weight: 800;">Report a Civic Grievance</h2>
+          <p style="color: var(--gray); font-size: 15px;">Your grievance will be automatically assigned to the designated municipal ward officer and tracked for SLA compliance.</p>
+        </div>
+
+        <div id="reportAlert" class="alert" style="display: none;"></div>
+
+        <form id="reportIssueForm" novalidate enctype="multipart/form-data">
+          <!-- Title -->
+          <div class="form-group">
+            <label for="reportTitle" class="form-label">Issue Title *</label>
+            <input type="text" id="reportTitle" class="form-control" placeholder="Brief summary of the issue (10 to 100 characters)" required minlength="10" maxlength="100">
+            <div id="titleError" class="error-message"></div>
+          </div>
+
+          <!-- Category & Ward -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label for="reportCategory" class="form-label">Category *</label>
+              <select id="reportCategory" class="form-control" required>
+                <option value="">-- Select Category --</option>
+              </select>
+              <div id="categoryError" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="reportWard" class="form-label">Municipal Ward *</label>
+              <select id="reportWard" class="form-control" required>
+                <option value="">-- Select Ward --</option>
+              </select>
+              <div id="wardError" class="error-message"></div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label for="reportDescription" class="form-label">Detailed Description *</label>
+            <textarea id="reportDescription" class="form-control" rows="5" placeholder="Describe the civic hazard, exact situation, and impact on residents (minimum 20 characters, up to 1000 characters)" required minlength="20" maxlength="1000"></textarea>
+            <div class="form-helper">
+              <span>Avoid all-caps and numeric-only descriptions.</span>
+              <span id="descCharCount">0 / 1000 characters</span>
+            </div>
+            <div id="descError" class="error-message"></div>
+          </div>
+
+          <!-- Detailed Street Address -->
+          <div class="form-group">
+            <label for="reportAddress" class="form-label">Specific Street Address &amp; Landmark *</label>
+            <input type="text" id="reportAddress" class="form-control" placeholder="e.g. Near Bus Depot, 3rd Cross Street, Adyar" required>
+            <div id="addressError" class="error-message"></div>
+          </div>
+
+          <!-- Optional Coordinates -->
+          <div class="form-group">
+            <label class="form-label">Optional GPS Coordinates</label>
+            <div class="coordinates-row">
+              <input type="number" step="any" id="reportLat" class="form-control" placeholder="Latitude (e.g. 13.0067)">
+              <input type="number" step="any" id="reportLng" class="form-control" placeholder="Longitude (e.g. 80.2570)">
+            </div>
+            <div class="form-helper">Provides precise mapping for municipal inspection squads.</div>
+          </div>
+
+          <!-- Optional Photo -->
+          <div class="form-group">
+            <label for="reportPhoto" class="form-label">Attach Photo (Optional)</label>
+            <input type="file" id="reportPhoto" class="form-control" accept="image/jpeg,image/png,image/webp">
+            <div class="form-helper">Max 5MB. Formats accepted: JPEG, PNG, WebP.</div>
+            <div id="photoPreviewBox" class="preview-box">
+              <p style="font-size: 11px; font-weight: 700; color: var(--gray); margin-bottom: 4px;">Photo Preview:</p>
+              <img id="photoPreviewImg" src="" alt="Preview">
+            </div>
+          </div>
+
+          <!-- Submission Progress Bar -->
+          <div id="reportProgress" class="alert alert-info" style="display: none; text-align: center;">
+            Uploading grievance and assigning to ward officer...
+          </div>
+
+          <div style="margin-top: 24px; display: flex; gap: 14px;">
+            <button type="submit" id="submitReportBtn" class="btn btn-primary btn-lg" style="flex: 2;">Submit Grievance Report</button>
+            <a href="/" class="btn btn-outline-secondary btn-lg" style="flex: 1;">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-text">
+        <strong>CivicTrack</strong> — Making Local Governance Accountable
+      </div>
+    </div>
+  </footer>
+
+  <script src="/vendor/jquery.min.js"></script>
+  <script src="/js/citizen.js"></script>
+  <script>
+    $(document).ready(function() {
+      initReportPage();
+    });
+  </script>
+</body>
+</html>
