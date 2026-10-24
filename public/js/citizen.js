@@ -62,7 +62,6 @@ function renderPlaceholderBanner(catId) {
   return `
     <div class="civic-card-banner civic-banner-${catId}">
       <div class="banner-pattern"></div>
-      <div class="banner-tag">Official Municipal Log</div>
       <div class="banner-center">
         <div class="banner-icon-circle">
           ${iconSvg}

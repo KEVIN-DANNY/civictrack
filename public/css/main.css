@@ -318,8 +318,9 @@ main {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 14px 16px;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
   color: #ffffff;
   overflow: hidden;
   user-select: none;
@@ -337,22 +338,6 @@ main {
   pointer-events: none;
 }
 
-.banner-tag {
-  position: relative;
-  z-index: 2;
-  align-self: flex-start;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  background: rgba(0, 0, 0, 0.28);
-  backdrop-filter: blur(4px);
-  padding: 3px 8px;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.95);
-}
-
 .banner-center {
   position: relative;
   z-index: 2;
@@ -360,7 +345,7 @@ main {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin: auto 0;
+  margin: 0;
 }
 
 .banner-icon-circle {
