@@ -132,7 +132,7 @@ function renderIssueDetail(issue) {
     .addClass('category-badge');
 
   $('#issueStatusBadge')
-    .text(issue.status.replace('_', ' '))
+    .html('<span class="status-dot"></span>' + issue.status.replace('_', ' '))
     .attr('class', `badge badge-${issue.status}`);
 
   // Escalation alert
@@ -177,6 +177,9 @@ function renderIssueDetail(issue) {
   renderComments(issue.comments || []);
 }
 
+const HEART_FILLED_SVG = `<svg class="inline-svg sm heart-filled" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+const HEART_EMPTY_SVG = `<svg class="inline-svg sm heart-empty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+
 function updateUpvoteButton(issue) {
   $('#upvoteCount').text(issue.upvoteCount || 0);
 
@@ -190,10 +193,10 @@ function updateUpvoteButton(issue) {
 
   if (hasUpvoted) {
     $('#btnUpvote').addClass('upvoted');
-    $('#heartIcon').text('❤️');
+    $('#heartIcon').html(HEART_FILLED_SVG);
   } else {
     $('#btnUpvote').removeClass('upvoted');
-    $('#heartIcon').text('🤍');
+    $('#heartIcon').html(HEART_EMPTY_SVG);
   }
 
   if (!currentUser) {
@@ -213,10 +216,10 @@ function toggleUpvote(issueId) {
         $('#upvoteCount').text(res.upvoteCount);
         if (res.upvoted) {
           $('#btnUpvote').addClass('upvoted');
-          $('#heartIcon').text('❤️');
+          $('#heartIcon').html(HEART_FILLED_SVG);
         } else {
           $('#btnUpvote').removeClass('upvoted');
-          $('#heartIcon').text('🤍');
+          $('#heartIcon').html(HEART_EMPTY_SVG);
         }
       }
     },
@@ -281,13 +284,16 @@ function renderStepperTimeline(issue) {
       noteText = hist.note;
     }
 
+    const checkSvg = `<svg class="inline-svg sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+    const clockSvg = `<svg class="inline-svg sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+
     const stepHtml = `
       <li class="step-item ${isCompleted ? 'completed' : ''}">
-        <div class="step-circle">${isCompleted ? '✓' : (idx + 1)}</div>
+        <div class="step-circle">${isCompleted ? checkSvg : (idx + 1)}</div>
         <div class="step-connector"></div>
         <div class="step-content">
-          <div class="step-title">${step.label} ${isCurrent ? '<span class="badge badge-' + issue.status + '">CURRENT</span>' : ''}</div>
-          <div class="step-date">🕒 ${dateText}</div>
+          <div class="step-title">${step.label} ${isCurrent ? '<span class="badge badge-' + issue.status + '"><span class="status-dot"></span>CURRENT</span>' : ''}</div>
+          <div class="step-date">${clockSvg} ${dateText}</div>
           <div class="step-note">${escapeHtml(noteText)}</div>
         </div>
       </li>
@@ -305,8 +311,11 @@ function renderStepperTimeline(issue) {
           <div class="step-circle">!</div>
           <div class="step-connector"></div>
           <div class="step-content" style="border-left: 3px solid var(--danger); background: #fff5f5;">
-            <div class="step-title" style="color: var(--danger);">🚨 Escalation Breach (Tier ${issue.escalationLevel})</div>
-            <div class="step-date">🕒 ${escDate}</div>
+            <div class="step-title" style="color: var(--danger); display: flex; align-items: center; gap: 4px;">
+              <svg class="inline-svg sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Escalation Breach (Tier ${issue.escalationLevel})
+            </div>
+            <div class="step-date">${clockSvg} ${escDate}</div>
             <div class="step-note">${escapeHtml(escNote)}</div>
           </div>
         </li>
@@ -326,13 +335,16 @@ function renderComments(comments) {
     return;
   }
 
+  const userSvg = `<svg class="inline-svg sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+  const clockSvg = `<svg class="inline-svg sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+
   comments.forEach(c => {
     const timeString = c.timestamp ? new Date(c.timestamp).toLocaleString() : '';
     const commentCard = `
       <div class="comment-card">
         <div class="comment-header">
-          <span class="comment-author">👤 ${escapeHtml(c.userName || 'Citizen')}</span>
-          <span class="comment-date">🕒 ${timeString}</span>
+          <span class="comment-author">${userSvg} ${escapeHtml(c.userName || 'Citizen')}</span>
+          <span class="comment-date">${clockSvg} ${timeString}</span>
         </div>
         <div class="comment-text">${escapeHtml(c.text)}</div>
       </div>

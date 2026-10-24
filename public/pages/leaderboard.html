@@ -73,7 +73,10 @@
 
         <div class="nav-auth">
           <div class="user-tag" ng-if="currentUser">
-            <span>👤 {{currentUser.name}}</span>
+            <span>
+              <svg class="inline-svg sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              {{currentUser.name}}
+            </span>
             <span class="role-pill" ng-class="currentUser.role">{{currentUser.role}}</span>
           </div>
           <button ng-if="currentUser" ng-click="logout()" class="btn btn-outline-danger btn-sm">Logout</button>
@@ -96,7 +99,11 @@
     <div class="chart-container">
       <div class="chart-header">
         <h3>Ward Accountability Scores Comparison</h3>
-        <span style="font-size: 12px; color: var(--gray);">🟢 ≥70 Exemplary &nbsp;|&nbsp; 🟠 40–69 Moderate &nbsp;|&nbsp; 🔴 &lt;40 Lagging</span>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <span class="chart-legend-pill high"><span class="status-dot"></span> ≥70 Exemplary</span>
+          <span class="chart-legend-pill medium"><span class="status-dot"></span> 40–69 Moderate</span>
+          <span class="chart-legend-pill low"><span class="status-dot"></span> &lt;40 Lagging</span>
+        </div>
       </div>
       <div style="width: 100%; overflow-x: auto;">
         <canvas id="leaderboardChartCanvas" height="280"></canvas>
@@ -111,9 +118,12 @@
           <span style="font-size: 12px; color: var(--gray);">Click on any row to expand the detailed score formula breakdown</span>
         </div>
 
-        <!-- Search input to filter by authority name or ward using Angular filter -->
+        <!-- Search input with vector icon -->
         <div style="min-width: 260px;">
-          <input type="text" ng-model="searchQuery" class="form-control" placeholder="🔍 Search officer or ward...">
+          <div class="search-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" ng-model="searchQuery" class="form-control" placeholder="Search officer or ward...">
+          </div>
         </div>
       </div>
 
@@ -141,13 +151,16 @@
                 ng-click="toggleExpand(item.authorityId._id || item._id)"
                 title="Click to toggle score component breakdown">
               <td>
-                <span class="rank-medal">{{getRankDisplay($index)}}</span>
+                <span class="rank-badge" ng-class="getRankBadgeClass($index)">{{getRankDisplay($index)}}</span>
               </td>
               <td>
                 <strong>{{item.authorityName || item.authorityId.name || 'Ward Officer'}}</strong>
               </td>
               <td>
-                <span style="font-weight: 700; color: var(--primary);">📍 {{item.ward || item.authorityId.ward}}</span>
+                <span style="font-weight: 700; color: var(--primary);">
+                  <svg class="inline-svg sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  {{item.ward || item.authorityId.ward}}
+                </span>
               </td>
               <td>
                 <span style="color: var(--gray); font-size: 13px;">{{item.department || item.authorityId.department || 'Civic Works'}}</span>

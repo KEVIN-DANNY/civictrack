@@ -5,14 +5,29 @@ const CHENNAI_WARDS = [
   'Kodambakkam', 'Tambaram', 'Perambur', 'Royapuram', 'Tondiarpet'
 ];
 
+const ICONS = {
+  roads: `<svg class="inline-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19L8 5M20 19l-4-14M12 5v3M12 11v3M12 17v3"/></svg>`,
+  water: `<svg class="inline-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`,
+  electricity: `<svg class="inline-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  sanitation: `<svg class="inline-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>`,
+  illegal_construction: `<svg class="inline-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="8" rx="1"/><path d="M17 14v7M7 14v7M4 14l3-8M20 14l-3-8M8 6h8"/></svg>`,
+  drainage: `<svg class="inline-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14M12 2v20M2 12h20M4.93 19.07l14.14-14.14"/></svg>`,
+  other: `<svg class="inline-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  location: `<svg class="inline-svg sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
+  clock: `<svg class="inline-svg sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+  heart: `<svg class="inline-svg sm heart-filled" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
+  comment: `<svg class="inline-svg sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
+  user: `<svg class="inline-svg sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`
+};
+
 const CATEGORIES = [
-  { id: 'roads', label: 'Roads & Pavements', icon: '🛣️' },
-  { id: 'water', label: 'Water Supply', icon: '💧' },
-  { id: 'electricity', label: 'Electricity & Streetlights', icon: '⚡' },
-  { id: 'sanitation', label: 'Sanitation & Garbage', icon: '🗑️' },
-  { id: 'illegal_construction', label: 'Illegal Construction', icon: '🏗️' },
-  { id: 'drainage', label: 'Drainage & Sewage', icon: '🚰' },
-  { id: 'other', label: 'Other Civic Grievance', icon: '📌' }
+  { id: 'roads', label: 'Roads & Pavements', dept: 'Roads & Infrastructure', deptSub: 'Public Works Department' },
+  { id: 'water', label: 'Water Supply', dept: 'Water Supply & Utilities', deptSub: 'MetroWater Supply Board' },
+  { id: 'electricity', label: 'Electricity & Streetlights', dept: 'Electrical Infrastructure', deptSub: 'Power Distribution Wing' },
+  { id: 'sanitation', label: 'Sanitation & Garbage', dept: 'Solid Waste & Sanitation', deptSub: 'Sanitation & Health Dept' },
+  { id: 'illegal_construction', label: 'Illegal Construction', dept: 'Urban Planning Enforcement', deptSub: 'Town Planning Division' },
+  { id: 'drainage', label: 'Drainage & Sewage', dept: 'Drainage & Stormwater', deptSub: 'Stormwater Management Division' },
+  { id: 'other', label: 'Other Civic Grievance', dept: 'Municipal Grievance Wing', deptSub: 'Ward Administrative Office' }
 ];
 
 // Helper to format time ago
@@ -31,8 +46,32 @@ function timeAgo(dateString) {
 
 // Helper to format category icon
 function getCategoryIcon(cat) {
+  return ICONS[cat] || ICONS.other;
+}
+
+function getCategoryLabel(cat) {
   const match = CATEGORIES.find(c => c.id === cat);
-  return match ? match.icon : '📌';
+  return match ? match.label : cat.replace('_', ' ');
+}
+
+// Render dynamic civic placeholder banner for empty photo cards
+function renderPlaceholderBanner(catId) {
+  const meta = CATEGORIES.find(c => c.id === catId) || CATEGORIES[6];
+  const iconSvg = ICONS[catId] || ICONS.other;
+
+  return `
+    <div class="civic-card-banner civic-banner-${catId}">
+      <div class="banner-pattern"></div>
+      <div class="banner-tag">Official Municipal Log</div>
+      <div class="banner-center">
+        <div class="banner-icon-circle">
+          ${iconSvg}
+        </div>
+        <div class="banner-dept-name">${meta.dept}</div>
+        <div class="banner-dept-sub">${meta.deptSub}</div>
+      </div>
+    </div>
+  `;
 }
 
 // Session state checker for navbar on jQuery pages
@@ -57,7 +96,7 @@ function checkSessionNav() {
 
         $('#navAuthDynamic').html(`
           <div class="user-tag">
-            <span>👤 ${user.name}</span>
+            <span>${ICONS.user} ${user.name}</span>
             <span class="role-pill ${user.role}">${user.role}</span>
           </div>
           <button id="navLogoutBtn" class="btn btn-outline-danger btn-sm">Logout</button>
@@ -240,8 +279,8 @@ function renderIssuesGrid(issues) {
       : '';
 
     const thumbHtml = issue.photo
-      ? `<img src="${issue.photo}" alt="${issue.title}">`
-      : `<div class="issue-placeholder-icon">${getCategoryIcon(issue.category)}</div>`;
+      ? `<img src="${issue.photo}" alt="${escapeHtml(issue.title)}">`
+      : renderPlaceholderBanner(issue.category);
 
     const card = `
       <a href="/pages/issue.html?id=${issue._id}" class="issue-card" data-id="${issue._id}">
@@ -250,20 +289,20 @@ function renderIssuesGrid(issues) {
         </div>
         <div class="issue-card-body">
           <div class="issue-badges">
-            <span class="badge badge-${issue.status}">${issue.status.replace('_', ' ')}</span>
-            <span class="category-badge">${getCategoryIcon(issue.category)} ${issue.category.replace('_', ' ')}</span>
+            <span class="badge badge-${issue.status}"><span class="status-dot"></span>${issue.status.replace('_', ' ')}</span>
+            <span class="category-badge">${getCategoryIcon(issue.category)} ${getCategoryLabel(issue.category)}</span>
             ${escalationHtml}
           </div>
           <h3 class="issue-title">${escapeHtml(issue.title)}</h3>
           <div class="issue-meta">
-            <span>📍 Ward: ${escapeHtml(issue.ward)}</span>
+            <span>${ICONS.location} Ward: ${escapeHtml(issue.ward)}</span>
             <span>•</span>
-            <span>🕒 ${timeAgo(issue.createdAt)}</span>
+            <span>${ICONS.clock} ${timeAgo(issue.createdAt)}</span>
           </div>
           <div class="issue-card-footer">
             <div class="card-counts">
-              <span class="count-pill">❤️ ${issue.upvoteCount || 0}</span>
-              <span class="count-pill">💬 ${issue.comments ? issue.comments.length : 0}</span>
+              <span class="count-pill">${ICONS.heart} ${issue.upvoteCount || 0}</span>
+              <span class="count-pill">${ICONS.comment} ${issue.comments ? issue.comments.length : 0}</span>
             </div>
             <span>Reported by: ${issue.reportedBy ? escapeHtml(issue.reportedBy.name) : 'Citizen'}</span>
           </div>
@@ -316,7 +355,7 @@ function initReportPage() {
   const $catSelect = $('#reportCategory');
   $catSelect.empty().append('<option value="">-- Select Category --</option>');
   CATEGORIES.forEach(c => {
-    $catSelect.append(`<option value="${c.id}">${c.icon} ${c.label}</option>`);
+    $catSelect.append(`<option value="${c.id}">${c.label}</option>`);
   });
 
   // Live character counter for description
@@ -558,10 +597,10 @@ function renderCitizenTable(statusFilter) {
     const row = `
       <tr class="${isEscalated ? 'row-escalated' : ''}">
         <td><strong><a href="/pages/issue.html?id=${issue._id}">${escapeHtml(issue.title)}</a></strong></td>
-        <td><span class="category-badge">${getCategoryIcon(issue.category)} ${issue.category.replace('_', ' ')}</span></td>
-        <td><span class="badge badge-${issue.status}">${issue.status.replace('_', ' ')}</span></td>
+        <td><span class="category-badge">${getCategoryIcon(issue.category)} ${getCategoryLabel(issue.category)}</span></td>
+        <td><span class="badge badge-${issue.status}"><span class="status-dot"></span>${issue.status.replace('_', ' ')}</span></td>
         <td>${escalationBadge}</td>
-        <td>❤️ ${issue.upvoteCount || 0}</td>
+        <td><span class="count-pill">${ICONS.heart} ${issue.upvoteCount || 0}</span></td>
         <td>${new Date(issue.createdAt).toLocaleDateString()}</td>
         <td>
           <a href="/pages/issue.html?id=${issue._id}" class="btn btn-outline-primary btn-sm">View Details</a>

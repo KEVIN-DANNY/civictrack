@@ -56,12 +56,16 @@ leaderboardApp.controller('LeaderboardController', ['$scope', '$http', '$timeout
       });
   };
 
-  // Helper for rank medal emoji
+  // Helper for rank badges
   $scope.getRankDisplay = function (index) {
-    if (index === 0) return '🥇 1st';
-    if (index === 1) return '🥈 2nd';
-    if (index === 2) return '🥉 3rd';
-    return (index + 1) + 'th';
+    return '#' + (index + 1);
+  };
+
+  $scope.getRankBadgeClass = function (index) {
+    if (index === 0) return 'rank-1';
+    if (index === 1) return 'rank-2';
+    if (index === 2) return 'rank-3';
+    return 'rank-default';
   };
 
   // Helper for score grade

@@ -263,7 +263,7 @@
                   </td>
                   <td>
                     <p style="margin: 0 0 6px 0;"><xsl:value-of select="Description"/></p>
-                    <small style="color: #64748b;">📍 <xsl:value-of select="Location"/> (Ward <xsl:value-of select="Ward"/>)</small>
+                    <small style="color: #64748b;">Location: <xsl:value-of select="Location"/> (Ward <xsl:value-of select="Ward"/>)</small>
                   </td>
                   <td>
                     <span class="badge badge-{Status}"><xsl:value-of select="Status"/></span>
@@ -290,7 +290,7 @@
                     </xsl:if>
                   </td>
                   <td>
-                    <strong>▲ <xsl:value-of select="Upvotes"/></strong> Upvotes
+                    <strong><xsl:value-of select="Upvotes"/></strong> Endorsements
                   </td>
                 </tr>
               </xsl:for-each>
